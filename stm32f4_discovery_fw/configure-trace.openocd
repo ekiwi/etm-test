@@ -1,12 +1,12 @@
+# source: https://github.com/PetteriAimonen/STM32_Trace_Example
+#
 # This file is an example of how to configure ITM/ETM tracing
 # using openocd if you do not want to modify the application.
 #
 # Use like this:
 # openocd -f configure-trace.openocd
 
-# Modify there to match your debugger hw & cpu
-source [find interface/stlink-v1.cfg]
-source [find target/stm32f1x_stlink.cfg]
+source [find board/stm32f4discovery.cfg]
 
 # Helper functions
 proc setbits {ADDR MASK} {
@@ -47,9 +47,9 @@ init
 halt
 
 # STM32 IO pin config
-setbits $RCC_APB2ENR 1                     ;# AFIOEN
-setbits $AFIO_MAPR 0x2000000               ;# Disable JTAG
-setbits $DBGMCU_CR 0x20                    ;# Enable trace IO pins
+#setbits $RCC_APB2ENR 1                     ;# AFIOEN
+#setbits $AFIO_MAPR 0x2000000               ;# Disable JTAG
+setbits $DBGMCU_CR 0x27                    ;# Enable trace IO pins
 
 # TPIU config
 setbits $COREDEBUG_DEMCR 0x1000000         ;# Enable access to trace regs
@@ -75,6 +75,7 @@ mww $ETM_TECR1 0x1000000                   ;# Trace always enabled
 mww $ETM_FFRR 0x1000000                    ;# Stalling always enabled
 mww $ETM_FFLR 24                           ;# Stall when less than N bytes free in FIFO (1..24)
 # clearbits $ETM_CR 0x400                  ;# Start tracing
+clearbits $ETM_CR 0x400                  ;# Start tracing
 
 # Resume CPU and exit openocd
 resume
