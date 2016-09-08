@@ -16,31 +16,55 @@ xpcc::log::Logger xpcc::log::warning(loggerDevice);
 xpcc::log::Logger xpcc::log::error(loggerDevice);
 
 
-using namespace Board;
-
 // ----------------------------------------------------------------------------
+
+using systemClock = SystemClock<ExternalCrystal<MHz8>>;
+
 int
 main()
 {
-	Board::initialize();
+	// initialize
+	systemClock::enable();
+	xpcc::cortex::SysTickTimer::initialize<systemClock>();
+
+	Board::LedOrange::setOutput(xpcc::Gpio::Low);
+	Board::LedGreen::setOutput(xpcc::Gpio::Low);
+	Board::LedRed::setOutput(xpcc::Gpio::Low);
+	Board::LedBlue::setOutput(xpcc::Gpio::Low);
+
+	Board::Button::setInput();
+	Board::Button::setInputTrigger(Gpio::InputTrigger::RisingEdge);
+	Board::Button::enableExternalInterrupt();
+
 
 	GpioOutputA2::connect(Usart2::Tx);
-	Usart2::initialize<Board::systemClock, 115200>(10);
+	Usart2::initialize<systemClock, 9600>(10);
 
 
 	XPCC_LOG_INFO << "Hello World!" << xpcc::endl;
 
+	XPCC_LOG_INFO << "DBGMCU->CR: 0x" << xpcc::hex << static_cast<uint32_t>(DBGMCU->CR) << xpcc::endl;
+	DBGMCU->CR = 0x27;
+	XPCC_LOG_INFO << "DBGMCU->CR: 0x" << xpcc::hex << static_cast<uint32_t>(DBGMCU->CR) << xpcc::endl;
 
-	LedOrange::set();
-	LedRed::set();
+
+	Board::LedOrange::set();
+	Board::LedRed::set();
+
+	int a[40];
 
 	while (1)
 	{
-		LedBlue::toggle();
-		LedGreen::toggle();
-		LedOrange::toggle();
-		LedRed::toggle();
-		xpcc::delayMilliseconds(Button::read() ? 250 : 500);
+		//Board::LedBlue::toggle();
+		//Board::LedGreen::toggle();
+		//Board::LedOrange::toggle();
+		//Board::LedRed::toggle();
+		//xpcc::delayMilliseconds(Board::Button::read() ? 250 : 500);
+
+		for(int ii = 0; ii < 40; ++ii) {
+			a[ii] += 1;
+		}
+
 	}
 
 	return 0;
