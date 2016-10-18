@@ -40,7 +40,9 @@ set ETM_CR               0xe0041000
 set ETM_TRACEIDR         0xe0041200
 set ETM_TECR1            0xe0041024
 set ETM_FFRR             0xe0041028
-set ETM_FFLR             0xe004102c
+
+set ETM_TEEVR            0xe0041020
+set ETM_TRIGGER          0xe0041008
 
 # Stop the CPU while we configure
 init
@@ -69,13 +71,29 @@ mww $ITM_TER 0xffffffff                    ;# Enable all stimulus ports
 # ETM config
 mww $ETM_LAR 0xC5ACCE55
 setbits $ETM_CR 0x400                      ;# ETM programming mode
-mww $ETM_CR 0xd80                          ;# Stall processor, report all branches
+
+
+# from STM Reference Manual
+mww $ETM_CR      0x1d1e
+mww $ETM_TRIGGER 0x406f
+mww $ETM_TEEVR   0x006f
+mww $ETM_TECR1   0x0001
+
+mww $ETM_TRACEIDR 5
+
+
+
+#mww $ETM_CR 0xd80                          ;# Stall processor, report all branches
 # mww $ETM_CR 0x800                        ;# No stalling, only indirect branches
-mww $ETM_TRACEIDR 2                        ;# TraceBusID 2
-mww $ETM_TECR1 0x1000000                   ;# Trace always enabled
-mww $ETM_FFRR 0x1000000                    ;# Stalling always enabled
-mww $ETM_FFLR 24                           ;# Stall when less than N bytes free in FIFO (1..24)
+#mww $ETM_TRACEIDR 2                        ;# TraceBusID 2
+#mww $ETM_TECR1 0x1000000                   ;# Trace always enabled
+#mww $ETM_FFRR 0x1000000                    ;# Stalling always enabled
+#mww $ETM_FFLR 24                           ;# Stall when less than N bytes free in FIFO (1..24)
 # clearbits $ETM_CR 0x400                  ;# Start tracing
+
+
+
+
 clearbits $ETM_CR 0x400                  ;# Start tracing
 
 # Resume CPU and exit openocd
