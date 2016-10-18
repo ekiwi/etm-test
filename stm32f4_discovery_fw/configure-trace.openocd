@@ -55,8 +55,8 @@ setbits $DBGMCU_CR 0x27                    ;# Enable trace IO pins
 setbits $COREDEBUG_DEMCR 0x1000000         ;# Enable access to trace regs
 mww $TPI_ACPR 0                            ;# Trace clock divider HCLK/(x+1)
 mww $TPI_SPPR 2                            ;# Pin protocol = NRZ/USART
-#mww $TPI_FFCR 0x102                        ;# Enable TPIU framing (0x100 to disable)
-mww $TPI_FFCR 0x100                        ;# Enable TPIU framing (0x100 to disable)
+# need framing to be able to use ETM
+mww $TPI_FFCR 0x102                        ;# Enable TPIU framing (0x100 to disable)
 
 # DWT config
 mww $DWT_CTRL 0x40011a01                   ;# 1/512 PC sampling, exc trace
