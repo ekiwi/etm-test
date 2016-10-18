@@ -51,7 +51,7 @@ main()
 	Board::LedOrange::set();
 	Board::LedRed::set();
 
-	int a[40];
+	volatile int a[40];
 
 	while (1)
 	{
