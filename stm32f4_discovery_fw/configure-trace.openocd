@@ -6,7 +6,7 @@
 # Use like this:
 # openocd -f configure-trace.openocd
 
-source [find board/stm32f4discovery.cfg]
+source [find board/stm32f3discovery.cfg]
 
 # Helper functions
 proc setbits {ADDR MASK} {
@@ -33,6 +33,8 @@ set TPI_SPPR             0xe00400f0
 set TPI_FFCR             0xe0040304
 set DWT_CTRL             0xe0001000
 set ITM_LAR              0xe0000fb0
+# trace privilege register
+set ITM_TPR              0xe0000e40
 set ITM_TCR              0xe0000e80
 set ITM_TER              0xe0000e00
 set ETM_LAR              0xe0041fb0
@@ -47,9 +49,7 @@ init
 halt
 
 # STM32 IO pin config
-#setbits $RCC_APB2ENR 1                     ;# AFIOEN
-#setbits $AFIO_MAPR 0x2000000               ;# Disable JTAG
-setbits $DBGMCU_CR 0x27                    ;# Enable trace IO pins
+setbits $DBGMCU_CR 0x20                    ;# Enable trace IO pins
 
 # TPIU config
 setbits $COREDEBUG_DEMCR 0x1000000         ;# Enable access to trace regs
@@ -58,24 +58,18 @@ mww $TPI_SPPR 2                            ;# Pin protocol = NRZ/USART
 mww $TPI_FFCR 0x102                        ;# Enable TPIU framing (0x100 to disable)
 
 # DWT config
-mww $DWT_CTRL 0x40011a01                   ;# 1/512 PC sampling, exc trace
+#mww $DWT_CTRL 0x40011a01                   ;# 1/512 PC sampling, exc trace
+mww $DWT_CTRL 0x401
 
 # ITM config
 mww $ITM_LAR 0xC5ACCE55
-mww $ITM_TCR 0x0001000d                    ;# TraceBusID 1, enable dwt/itm/sync
-mww $ITM_TER 0xffffffff                    ;# Enable all stimulus ports
+#mww $ITM_TCR 0x0004000d                    ;# TraceBusID 1, enable dwt/itm/sync
+#mww $ITM_TER 0xffffffff                    ;# Enable all stimulus ports
+# STM Reference Manual Example Configuration
+mww $ITM_TCR 0x00010005
+mww $ITM_TER 3
+mww $ITM_TPR 3
 
-# ETM config
-mww $ETM_LAR 0xC5ACCE55
-setbits $ETM_CR 0x400                      ;# ETM programming mode
-mww $ETM_CR 0xd80                          ;# Stall processor, report all branches
-# mww $ETM_CR 0x800                        ;# No stalling, only indirect branches
-mww $ETM_TRACEIDR 2                        ;# TraceBusID 2
-mww $ETM_TECR1 0x1000000                   ;# Trace always enabled
-mww $ETM_FFRR 0x1000000                    ;# Stalling always enabled
-mww $ETM_FFLR 24                           ;# Stall when less than N bytes free in FIFO (1..24)
-# clearbits $ETM_CR 0x400                  ;# Start tracing
-clearbits $ETM_CR 0x400                  ;# Start tracing
 
 # Resume CPU and exit openocd
 resume

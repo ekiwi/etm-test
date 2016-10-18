@@ -27,6 +27,10 @@ main()
 	systemClock::enable();
 	xpcc::cortex::SysTickTimer::initialize<systemClock>();
 
+	// output clock
+	ClockOutput2::connect(systemClock::Id);
+	GpioOutputC9::connect(ClockOutput2::Id);
+
 	Board::LedOrange::setOutput(xpcc::Gpio::Low);
 	Board::LedGreen::setOutput(xpcc::Gpio::Low);
 	Board::LedRed::setOutput(xpcc::Gpio::Low);
@@ -43,9 +47,9 @@ main()
 
 	XPCC_LOG_INFO << "Hello World!" << xpcc::endl;
 
-	XPCC_LOG_INFO << "DBGMCU->CR: 0x" << xpcc::hex << static_cast<uint32_t>(DBGMCU->CR) << xpcc::endl;
-	DBGMCU->CR = 0x27;
-	XPCC_LOG_INFO << "DBGMCU->CR: 0x" << xpcc::hex << static_cast<uint32_t>(DBGMCU->CR) << xpcc::endl;
+	// XPCC_LOG_INFO << "DBGMCU->CR: 0x" << xpcc::hex << static_cast<uint32_t>(DBGMCU->CR) << xpcc::endl;
+	// DBGMCU->CR = 0x27;
+	// XPCC_LOG_INFO << "DBGMCU->CR: 0x" << xpcc::hex << static_cast<uint32_t>(DBGMCU->CR) << xpcc::endl;
 
 
 	Board::LedOrange::set();
@@ -55,11 +59,17 @@ main()
 
 	while (1)
 	{
-		//Board::LedBlue::toggle();
-		//Board::LedGreen::toggle();
-		//Board::LedOrange::toggle();
-		//Board::LedRed::toggle();
-		//xpcc::delayMilliseconds(Board::Button::read() ? 250 : 500);
+		// Board::LedBlue::toggle();
+		// Board::LedGreen::toggle();
+		// Board::LedOrange::toggle();
+		// Board::LedRed::toggle();
+		// xpcc::delayMilliseconds(Board::Button::read() ? 250 : 500);
+		ITM->PORT[0].u32 = ((uint32_t)'a') << 24 | ((uint32_t)'b') << 16 | ((uint32_t)'c') << 8 | ((uint32_t)'d');
+
+		xpcc::delayMilliseconds(1);
+
+		ITM->PORT[1].u32 = ((uint32_t)'w') << 24 | ((uint32_t)'x') << 16 | ((uint32_t)'y') << 8 | ((uint32_t)'z');
+
 
 		for(int ii = 0; ii < 40; ++ii) {
 			a[ii] += 1;
