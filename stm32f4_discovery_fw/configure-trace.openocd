@@ -82,7 +82,6 @@ mww $ETM_TRIGGER 0x406f
 mww $ETM_TEEVR 0x006f
 
 # clearbits $ETM_CR 0x400                  ;# Start tracing
-clearbits $ETM_CR 0x400                  ;# Start tracing
 
 # Resume CPU and exit openocd
 resume
