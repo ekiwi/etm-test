@@ -59,7 +59,7 @@ mww $TPI_SPPR 2                            ;# Pin protocol = NRZ/USART
 mww $TPI_FFCR 0x102                        ;# Enable TPIU framing (0x100 to disable)
 
 # DWT config
-mww $DWT_CTRL 0x40011a01                   ;# 1/512 PC sampling, exc trace
+mww $DWT_CTRL 0x401                        ;# sync every 2^24 clock cycles
 
 # ITM config
 mww $ITM_LAR 0xC5ACCE55
